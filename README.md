@@ -34,3 +34,8 @@ docker run --name "learning-jdbc-pg" -e POSTGRES_PASSWORD=pgpw -d -p 5432:5432 -
 - Provides single domain data (meaning that it can carry data from a single model or a join between different tables, though always within the same domain);
 - Should fully encapsulate the object it means to represent, including sub-objects;
 - Should be the output/input of a single DAO;
+
+### Repositories
+- Are restricted to accessing a single table and, therefore, are unfit for working with aggregate data;
+- Require aggregation to be done in the application layer;
+- Are especially fit for working with sharded databases, which is very common in NoSQL, distributed DBs; For work with traditional, relational DBs, DAOs are more appropriate.
