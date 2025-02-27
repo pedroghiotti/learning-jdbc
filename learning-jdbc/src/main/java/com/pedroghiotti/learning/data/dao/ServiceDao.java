@@ -3,10 +3,7 @@ package com.pedroghiotti.learning.data.dao;
 import com.pedroghiotti.learning.data.entity.Service;
 import com.pedroghiotti.learning.data.util.DatabaseUtils;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +13,8 @@ import java.util.logging.Logger;
 public class ServiceDao implements Dao<Service, UUID>{
     private static final Logger LOGGER = Logger.getLogger(ServiceDao.class.getName());
 
-    private static String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
+    private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
+    private static final String GET_BY_ID = "SELECT service_id, name, price FROM wisdom.services WHERE service_id = ?";
 
     @Override
     public Service create(Service entity) {
@@ -40,6 +38,20 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     @Override
     public Optional<Service> getById(UUID uuid) {
+        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_BY_ID)){
+            statement.setObject(1, uuid);
+
+            ResultSet queryResultSet = statement.executeQuery();
+            List<Service> services = this.processResultSet(queryResultSet);
+
+            if(services.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(services.get(0));
+        } catch (SQLException e) {
+            DatabaseUtils.handleSqlException("ServiceDao.getAll", e, LOGGER);
+        }
+
         return Optional.empty();
     }
 
