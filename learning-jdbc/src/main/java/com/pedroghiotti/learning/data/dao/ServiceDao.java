@@ -3,6 +3,8 @@ package com.pedroghiotti.learning.data.dao;
 import com.pedroghiotti.learning.data.entity.Service;
 import com.pedroghiotti.learning.data.util.DatabaseUtils;
 
+import javax.swing.text.html.Option;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +17,47 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
     private static final String GET_BY_ID = "SELECT service_id, name, price FROM wisdom.services WHERE service_id = ?";
+    private static final String CREATE = "INSERT INTO wisdom.services (service_id, name, price) VALUES (?, ?, ?)";
 
     @Override
     public Service create(Service entity) {
-        return null;
+
+        UUID serviceId = UUID.randomUUID();
+        String serviceName = entity.getName();
+        BigDecimal servicePrice = entity.getPrice();
+
+        Connection connection = DatabaseUtils.getConnection();
+
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(CREATE);
+            statement.setObject(1, serviceId);
+            statement.setString(2, serviceName);
+            statement.setBigDecimal(3, servicePrice);
+            statement.execute();
+            connection.commit();
+            statement.close();
+        } catch (SQLException createException) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                DatabaseUtils.handleSqlException("ServiceDao.create.rollback", rollbackException, LOGGER);
+            }
+            DatabaseUtils.handleSqlException("ServiceDao.create", createException, LOGGER);
+        }
+
+        Optional<Service> service = this.getById(serviceId);
+
+        return service.orElse(null);
+
     }
 
     @Override
     public List<Service> getAll() {
         List<Service> services = new ArrayList<>();
 
-        Connection connection = DatabaseUtils.getConnection();
-        try(Statement statement = connection.createStatement()) {
-            ResultSet queryResultSet = statement.executeQuery(GET_ALL);
+        try(PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_ALL)) {
+            ResultSet queryResultSet = statement.executeQuery();
             services = this.processResultSet(queryResultSet);
         } catch (SQLException e) {
             DatabaseUtils.handleSqlException("ServiceDao.getAll", e, LOGGER);

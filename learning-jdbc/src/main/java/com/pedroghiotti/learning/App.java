@@ -3,6 +3,7 @@ package com.pedroghiotti.learning;
 import com.pedroghiotti.learning.data.dao.ServiceDao;
 import com.pedroghiotti.learning.data.entity.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +20,10 @@ public class App {
         Optional<Service> serviceById = serviceDao.getById(services.get(0).getServiceId());
         System.out.println("\n===GET_BY_ID===\n" + serviceById.get());
 
+        Service newService = new Service();
+        newService.setName("NewService@"+System.currentTimeMillis());
+        newService.setPrice(new BigDecimal(0));
+        newService = serviceDao.create(newService);
+        System.out.println("\n===CRATE===\n" + newService);
     }
 }
