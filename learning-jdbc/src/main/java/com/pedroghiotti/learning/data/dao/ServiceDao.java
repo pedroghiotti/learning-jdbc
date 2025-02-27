@@ -18,7 +18,8 @@ public class ServiceDao implements Dao<Service, UUID>{
     private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
     private static final String GET_BY_ID = "SELECT service_id, name, price FROM wisdom.services WHERE service_id = ?";
     private static final String CREATE = "INSERT INTO wisdom.services (service_id, name, price) VALUES (?, ?, ?)";
-    private static final String UPDATE = "UPDATE wisdom.services SET name=?, price=? WHERE service_id = ?";
+    private static final String UPDATE = "UPDATE wisdom.services SET name = ?, price = ? WHERE service_id = ?";
+    private static final String DELETE = "DELETE FROM wisdom.services WHERE service_id = ?";
 
     @Override
     public Service create(Service entity) {
@@ -99,7 +100,7 @@ public class ServiceDao implements Dao<Service, UUID>{
             statement.setString(1, serviceName);
             statement.setBigDecimal(2, servicePrice);
             statement.setObject(3, serviceId);
-            statement.execute();
+            statement.executeUpdate();
             connection.commit();
             statement.close();
         } catch (SQLException updateException) {
@@ -116,7 +117,17 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     @Override
     public void delete(UUID uuid) {
-
+        Connection connection = DatabaseUtils.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(DELETE);
+            statement.setObject(1, uuid);
+            statement.executeUpdate();
+            connection.commit();
+            connection.close();
+        } catch (SQLException e) {
+            DatabaseUtils.handleSqlException("ServiceDao.delete", e, LOGGER);
+        }
     }
 
     private List<Service> processResultSet(ResultSet rs) throws SQLException {
