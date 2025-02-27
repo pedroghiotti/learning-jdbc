@@ -18,6 +18,7 @@ public class ServiceDao implements Dao<Service, UUID>{
     private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
     private static final String GET_BY_ID = "SELECT service_id, name, price FROM wisdom.services WHERE service_id = ?";
     private static final String CREATE = "INSERT INTO wisdom.services (service_id, name, price) VALUES (?, ?, ?)";
+    private static final String UPDATE = "UPDATE wisdom.services SET name=?, price=? WHERE service_id = ?";
 
     @Override
     public Service create(Service entity) {
@@ -49,7 +50,6 @@ public class ServiceDao implements Dao<Service, UUID>{
         Optional<Service> service = this.getById(serviceId);
 
         return service.orElse(null);
-
     }
 
     @Override
@@ -87,7 +87,31 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     @Override
     public Service update(Service entity) {
-        return null;
+        UUID serviceId = entity.getServiceId();
+        String serviceName = entity.getName();
+        BigDecimal servicePrice = entity.getPrice();
+
+        Connection connection = DatabaseUtils.getConnection();
+
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(UPDATE);
+            statement.setString(1, serviceName);
+            statement.setBigDecimal(2, servicePrice);
+            statement.setObject(3, serviceId);
+            statement.execute();
+            connection.commit();
+            statement.close();
+        } catch (SQLException updateException) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                DatabaseUtils.handleSqlException("ServiceDao.update.rollback", rollbackException, LOGGER);
+            }
+            DatabaseUtils.handleSqlException("ServiceDao.update", updateException, LOGGER);
+        }
+
+        return this.getById(serviceId).get();
     }
 
     @Override

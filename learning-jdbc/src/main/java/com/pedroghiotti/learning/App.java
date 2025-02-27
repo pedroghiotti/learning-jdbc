@@ -24,6 +24,11 @@ public class App {
         newService.setName("NewService@"+System.currentTimeMillis());
         newService.setPrice(new BigDecimal(0));
         newService = serviceDao.create(newService);
-        System.out.println("\n===CRATE===\n" + newService);
+        System.out.println("\n===CREATE===\n" + newService);
+
+        newService.setName("NewerService@"+System.currentTimeMillis());
+        newService.setPrice(new BigDecimal(100));
+        newService = serviceDao.update(newService);
+        System.out.println("\n===UPDATE===\n" + newService);
     }
 }
