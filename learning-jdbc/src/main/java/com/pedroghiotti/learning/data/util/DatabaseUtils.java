@@ -10,8 +10,8 @@ public class DatabaseUtils {
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "pgpw";
 
-    private static final Logger logger = Logger.getLogger(DatabaseUtils.class.getName());
-    private static final String exceptionFormat = "exception in: %s, message: %s, code: %s";
+    private static final Logger LOGGER = Logger.getLogger(DatabaseUtils.class.getName());
+    private static final String EXCEPTION_FORMAT = "exception in: %s, message: %s, code: %s";
 
     private static Connection connection;
 
@@ -22,7 +22,7 @@ public class DatabaseUtils {
                     try {
                         connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
                     } catch (SQLException e) {
-                        handleSqlException("DatabaseUtils.getConnection", e, logger);
+                        handleSqlException("DatabaseUtils.getConnection", e, LOGGER);
                     }
                 }
             }
@@ -32,7 +32,7 @@ public class DatabaseUtils {
     }
 
     public static void handleSqlException(String method, SQLException e, Logger log) {
-        log.warning(String.format(exceptionFormat, method, e.getMessage(), e.getErrorCode()));
+        log.warning(String.format(EXCEPTION_FORMAT, method, e.getMessage(), e.getErrorCode()));
         throw new RuntimeException(e);
     }
 }
