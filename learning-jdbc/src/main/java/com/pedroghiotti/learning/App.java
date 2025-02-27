@@ -1,10 +1,14 @@
 package com.pedroghiotti.learning;
 
-/**
- * Hello world!
- */
+import com.pedroghiotti.learning.data.dao.ServiceDao;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        ServiceDao serviceDao = new ServiceDao();
+
+        System.out.println("\n===GET=ALL===");
+        serviceDao.getAll().forEach(System.out::println);
+
+
     }
 }
