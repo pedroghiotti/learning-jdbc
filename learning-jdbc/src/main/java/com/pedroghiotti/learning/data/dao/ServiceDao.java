@@ -3,16 +3,18 @@ package com.pedroghiotti.learning.data.dao;
 import com.pedroghiotti.learning.data.entity.Service;
 import com.pedroghiotti.learning.data.util.DatabaseUtils;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class ServiceDao implements Dao<Service, UUID>{
+public class ServiceDao implements Dao<Service, UUID> {
     private static final Logger LOGGER = Logger.getLogger(ServiceDao.class.getName());
 
     private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
@@ -23,7 +25,6 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     @Override
     public Service create(Service entity) {
-
         UUID serviceId = UUID.randomUUID();
         String serviceName = entity.getName();
         BigDecimal servicePrice = entity.getPrice();
@@ -57,7 +58,7 @@ public class ServiceDao implements Dao<Service, UUID>{
     public List<Service> getAll() {
         List<Service> services = new ArrayList<>();
 
-        try(PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_ALL)) {
+        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_ALL)) {
             ResultSet queryResultSet = statement.executeQuery();
             services = this.processResultSet(queryResultSet);
         } catch (SQLException e) {
@@ -69,13 +70,13 @@ public class ServiceDao implements Dao<Service, UUID>{
 
     @Override
     public Optional<Service> getById(UUID uuid) {
-        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_BY_ID)){
+        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_BY_ID)) {
             statement.setObject(1, uuid);
 
             ResultSet queryResultSet = statement.executeQuery();
             List<Service> services = this.processResultSet(queryResultSet);
 
-            if(services.isEmpty()) {
+            if (services.isEmpty()) {
                 return Optional.empty();
             }
             return Optional.of(services.get(0));
@@ -133,7 +134,7 @@ public class ServiceDao implements Dao<Service, UUID>{
     private List<Service> processResultSet(ResultSet rs) throws SQLException {
         List<Service> services = new ArrayList<>();
 
-        while(rs.next()) {
+        while (rs.next()) {
             Service service = new Service();
 
             service.setServiceId((UUID) rs.getObject("service_id"));
