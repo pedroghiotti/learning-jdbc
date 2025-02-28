@@ -17,6 +17,7 @@ public class CustomerDao implements Dao<Customer, UUID> {
     private static final Logger LOGGER = Logger.getLogger(CustomerDao.class.getName());
 
     private static final String GET_ALL = "SELECT customer_id, first_name, last_name, email, phone, address FROM wisdom.customers";
+    private static final String GET_ALL_PAGED = "SELECT customer_id, first_name, last_name, email, phone, address FROM wisdom.customers ORDER BY customer_id LIMIT ? OFFSET ?";
     private static final String GET_BY_ID = "SELECT customer_id, first_name, last_name, email, phone, address FROM wisdom.customers WHERE customer_id = ?";
     private static final String CREATE = "INSERT INTO wisdom.customers (customer_id, first_name, last_name, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE = "UPDATE wisdom.customers SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ? WHERE customer_id = ?";
@@ -63,6 +64,25 @@ public class CustomerDao implements Dao<Customer, UUID> {
             customers = this.processResultSet(queryResultSet);
         } catch (SQLException e) {
             DatabaseUtils.handleSqlException("CustomerDao.getAll", e, LOGGER);
+        }
+
+        return customers;
+    }
+
+    public List<Customer> getAll(int limit, int pageNumber) {
+        List<Customer> customers = new ArrayList<>();
+
+        if (limit <= 0 || pageNumber <= 0) {
+            return customers;
+        }
+
+        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_ALL_PAGED)) {
+            statement.setInt(1, limit);
+            statement.setInt(2, limit * (pageNumber - 1));
+            ResultSet queryResultSet = statement.executeQuery();
+            customers = this.processResultSet(queryResultSet);
+        } catch (SQLException e) {
+            DatabaseUtils.handleSqlException("CustomerDao.getAllPaged", e, LOGGER);
         }
 
         return customers;

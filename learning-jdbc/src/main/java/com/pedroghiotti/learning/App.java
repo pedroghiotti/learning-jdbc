@@ -13,8 +13,8 @@ import java.util.UUID;
 
 public class App {
     public static void main(String[] args) {
-        testServiceDao();
-//        testCustomerDao();
+//        testServiceDao();
+        testCustomerDao();
 //        testSimpleProductDao();
     }
 
@@ -56,6 +56,10 @@ public class App {
 
         List<Customer> customers = customerDao.getAll();
         System.out.println("\n===GET_ALL===");
+        customers.forEach(System.out::println);
+
+        customers = customerDao.getAll(5, 1);
+        System.out.println("\n===GET_ALL_LIMIT===");
         customers.forEach(System.out::println);
 
         Optional<Customer> serviceById = customerDao.getById(customers.get(0).getCustomerId());
