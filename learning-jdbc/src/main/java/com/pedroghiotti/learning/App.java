@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public class App {
     public static void main(String[] args) {
-//        testServiceDao();
+        testServiceDao();
 //        testCustomerDao();
-        testSimpleProductDao();
+//        testSimpleProductDao();
     }
 
     public static void testServiceDao() {
@@ -25,6 +25,10 @@ public class App {
 
         List<Service> services = serviceDao.getAll();
         System.out.println("\n===GET_ALL===");
+        services.forEach(System.out::println);
+
+        services = serviceDao.getAll(5);
+        System.out.println("\n===GET_ALL_LIMIT===");
         services.forEach(System.out::println);
 
         Optional<Service> serviceById = serviceDao.getById(services.get(0).getServiceId());

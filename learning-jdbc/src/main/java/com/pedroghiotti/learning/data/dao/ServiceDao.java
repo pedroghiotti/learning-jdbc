@@ -18,6 +18,7 @@ public class ServiceDao implements Dao<Service, UUID> {
     private static final Logger LOGGER = Logger.getLogger(ServiceDao.class.getName());
 
     private static final String GET_ALL = "SELECT service_id, name, price FROM wisdom.services";
+    private static final String GET_ALL_LIMIT = "SELECT service_id, name, price FROM wisdom.services LIMIT ?";
     private static final String GET_BY_ID = "SELECT service_id, name, price FROM wisdom.services WHERE service_id = ?";
     private static final String CREATE = "INSERT INTO wisdom.services (service_id, name, price) VALUES (?, ?, ?)";
     private static final String UPDATE = "UPDATE wisdom.services SET name = ?, price = ? WHERE service_id = ?";
@@ -63,6 +64,24 @@ public class ServiceDao implements Dao<Service, UUID> {
             services = this.processResultSet(queryResultSet);
         } catch (SQLException e) {
             DatabaseUtils.handleSqlException("ServiceDao.getAll", e, LOGGER);
+        }
+
+        return services;
+    }
+
+    public List<Service> getAll(int limit) {
+        List<Service> services = new ArrayList<>();
+        
+        if (limit <= 0) {
+            return services;
+        }
+
+        try (PreparedStatement statement = DatabaseUtils.getConnection().prepareStatement(GET_ALL_LIMIT)) {
+            statement.setInt(1, limit);
+            ResultSet queryResultSet = statement.executeQuery();
+            services = this.processResultSet(queryResultSet);
+        } catch (SQLException e) {
+            DatabaseUtils.handleSqlException("ServiceDao.getAllLimit", e, LOGGER);
         }
 
         return services;
