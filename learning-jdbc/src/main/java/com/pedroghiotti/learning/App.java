@@ -2,17 +2,20 @@ package com.pedroghiotti.learning;
 
 import com.pedroghiotti.learning.data.dao.CustomerDao;
 import com.pedroghiotti.learning.data.dao.ServiceDao;
+import com.pedroghiotti.learning.data.dao.SimpleProductDao;
 import com.pedroghiotti.learning.data.entity.Customer;
 import com.pedroghiotti.learning.data.entity.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class App {
     public static void main(String[] args) {
 //        testServiceDao();
-        testCustomerDao();
+//        testCustomerDao();
+        testSimpleProductDao();
     }
 
     public static void testServiceDao() {
@@ -70,5 +73,15 @@ public class App {
 
         customerDao.delete(newCustomer.getCustomerId());
         System.out.println("\n===DELETE===\n");
+    }
+
+
+    private static void testSimpleProductDao() {
+        SimpleProductDao simpleProductDao = new SimpleProductDao();
+
+        System.out.println("\n====SIMPLE_PRODUCT====");
+
+        UUID productId = simpleProductDao.create("newProduct@" + System.currentTimeMillis(), new BigDecimal(100), "Jaloo");
+        System.out.println("\n===CREATE===\n" + productId);
     }
 }
